@@ -3,12 +3,18 @@ session_start();
 require 'config.php';
 require 'session_helper.php';
 
-// Add these 3 lines:
+// Add error handling to return JSON errors
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
+
+// Set JSON header immediately
 header('Content-Type: application/json; charset=utf-8');
 
-// Rest of your code...
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 requireAuth();
 $userId = $_SESSION['user_id'];
 $roles = requireRole($conn, $userId, 'manager');
@@ -355,3 +361,4 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
 }
+?>

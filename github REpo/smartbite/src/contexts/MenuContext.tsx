@@ -62,12 +62,12 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       console.log('🔄 Adding menu item...', itemData);
-      
+
       // Frontend validation
-      const requiredFields = ['restaurant_id', 'item_name', 'item_description', 'item_price', 'category'];
+      const requiredFields = ['item_name', 'item_description', 'item_price', 'category'];
       for (const field of requiredFields) {
         if (!itemData[field] || (typeof itemData[field] === 'string' && !itemData[field].trim())) {
-          throw new Error(`${field.replace('_', ' ')} is required`);
+          throw new Error(`${field.replace(/_/g, ' ')} is required`);
         }
       }
 
@@ -76,10 +76,12 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
       }
 
       const response = await menuAPI.createMenuItem(itemData);
-      
+
       // Refresh menu items
-      await fetchMenuItems(itemData.restaurant_id);
-      
+      if (itemData.restaurant_id) {
+        await fetchMenuItems(itemData.restaurant_id);
+      }
+
       console.log('✅ Menu item added successfully');
       return response.data.itemId;
     } catch (error: any) {

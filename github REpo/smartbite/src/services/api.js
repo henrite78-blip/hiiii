@@ -162,34 +162,41 @@ export const restaurantsAPI = {
 
 export const menuAPI = {
   getMenuItems: async (restaurantId) => {
-    const response = await serveSoftAPI.request(`api_customer.php?action=get_menu&restaurant_id=${restaurantId}`);
+    const response = await serveSoftAPI.request(`api_manager.php?action=get_menu`);
 
     return {
       data: response.data.menu.map(item => ({
         id: item.id,
         restaurant_id: restaurantId,
-        name: item.name,
-        description: item.description,
+        item_name: item.name,
+        item_description: item.description,
         category: item.category,
-        price: item.price,
+        item_price: item.price,
         is_available: item.available,
-        image_url: '/food-placeholder.jpg'
+        image: '/food-placeholder.jpg',
+        prep_time: 30
       }))
     };
   },
 
   createMenuItem: async (data) => {
-    return serveSoftAPI.request('api_manager.php', {
+    const response = await serveSoftAPI.request('api_manager.php', {
       method: 'POST',
       body: JSON.stringify({
         action: 'add_menu_item',
-        name: data.name,
-        description: data.description,
+        name: data.item_name,
+        description: data.item_description,
         category: data.category,
-        price: data.price,
+        price: data.item_price,
         available: data.is_available !== false
       })
     });
+
+    return {
+      data: {
+        itemId: response.data.menu_id
+      }
+    };
   },
 
   updateMenuItem: async (id, data) => {
@@ -198,10 +205,10 @@ export const menuAPI = {
       body: JSON.stringify({
         action: 'update_menu_item',
         menu_id: id,
-        name: data.name,
-        description: data.description,
+        name: data.item_name,
+        description: data.item_description,
         category: data.category,
-        price: data.price,
+        price: data.item_price,
         available: data.is_available !== false
       })
     });
